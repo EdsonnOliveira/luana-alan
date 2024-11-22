@@ -92,9 +92,6 @@ export default function Home() {
       src: '/gallery/Allan&Luana-27.jpg',
     },
     {
-      src: '/gallery/Allan&Luana-31.jpg',
-    },
-    {
       src: '/gallery/Allan&Luana-48.jpg',
     },
     {

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dataBase from '@/firebase/contents';
 import { PersonsType } from '@/firebase/types/persons';
 
@@ -29,6 +29,29 @@ const ContentSection = styled.section`
   }
 `;
 
+const BoxDate = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 3.5rem;
+`
+
+const TextDate = styled.h1`
+  text-align: center;
+  font-size: 3.5rem;
+  font-family: 'Times New Roman', serif;
+  color: #2A2E29;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+
+  @media (max-width: 768px) {
+    font-size: 2.5rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 2rem;
+  }
+`;
+
 const Title = styled.h1`
   text-align: center;
   font-size: 3.5rem;
@@ -52,9 +75,23 @@ const Subtitle = styled.p`
   text-align: center;
   font-size: 1.2rem;
   color: #666;
+  max-width: 600px;
+  line-height: 1.6;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
+`;
+
+const Subtitle2 = styled.p`
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
   margin-bottom: 40px;
   max-width: 600px;
   line-height: 1.6;
+  font-style: italic;
+  font-weight: 600;
 
   @media (max-width: 768px) {
     font-size: 1.1rem;
@@ -109,6 +146,39 @@ const Arrow = styled.span`
 
 export default function ConfirmPresence() {
   const [identity, setIdentity] = useState<string>('')
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      let targetDate = new Date('2025-02-22')
+      console.log('-', targetDate)
+      const now = new Date().getTime();
+      const distance = targetDate.getTime() - now;
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      if (distance < 0) {
+        clearInterval(interval);
+      } else {
+        setTimeLeft({
+          days,
+          hours,
+          minutes,
+          seconds
+        });
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const onNext = async () => {
     try {
@@ -151,10 +221,31 @@ export default function ConfirmPresence() {
       <Header />
       <MainContent>
         <ContentSection>
+          <BoxDate>
+            <div>
+              <TextDate>{timeLeft.days}</TextDate>
+              <Subtitle>DIAS</Subtitle>
+            </div>
+            <div>
+              <TextDate>{timeLeft.hours}</TextDate>
+              <Subtitle>HORAS</Subtitle>
+            </div>
+            <div>
+              <TextDate>{timeLeft.minutes}</TextDate>
+              <Subtitle>MIN</Subtitle>
+            </div>
+            <div>
+              <TextDate>{timeLeft.seconds}</TextDate>
+              <Subtitle>SEG</Subtitle>
+            </div>
+          </BoxDate>
           <Title>Qual o nome que está no convite?</Title>
           <Subtitle>
             Você pode informar o nome do convite enviado por Luana & Alan
           </Subtitle>
+          <Subtitle2>
+            Data: 22/02/2025 - Horário: 16h
+          </Subtitle2>
           <Input
             value={identity}
             onChange={(a) => setIdentity(a.target.value)}
