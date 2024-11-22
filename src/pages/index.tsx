@@ -101,9 +101,6 @@ export default function Home() {
       src: '/gallery/Allan&Luana-49 4.jpg',
     },
     {
-      src: '/gallery/Allan&Luana-49.jpg',
-    },
-    {
       src: '/gallery/Allan&Luana-51.jpg',
     },
     {
@@ -113,13 +110,7 @@ export default function Home() {
       src: '/gallery/Allan&Luana-55 2.jpg',
     },
     {
-      src: '/gallery/Allan&Luana-62 2.jpg',
-    },
-    {
       src: '/gallery/Allan&Luana-62.jpg',
-    },
-    {
-      src: '/gallery/Allan&Luana-63.jpg',
     },
     {
       src: '/gallery/Allan&Luana-68.jpg',
@@ -138,9 +129,6 @@ export default function Home() {
     },
     {
       src: '/gallery/Allan&Luana-79 2.jpg',
-    },
-    {
-      src: '/gallery/Allan&Luana-79 3.jpg',
     },
   ];
 

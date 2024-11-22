@@ -1,145 +1,148 @@
 import styled from 'styled-components';
-import Image from 'next/image';
-import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { useState } from 'react';
 import dataBase from '@/firebase/contents';
-import { GiftsType } from '@/firebase/types/persons';
+import { PersonsType } from '@/firebase/types/persons';
 
 const MainContent = styled.main`
   padding-top: 120px;
+  min-height: calc(100vh - 80px);
+  background-color: #F5F5F5;
+
+  @media (max-width: 768px) {
+    padding-top: 80px;
+  }
+`;
+
+const ContentSection = styled.section`
   max-width: 1200px;
   margin: 0 auto;
-  padding-bottom: 80px;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  @media (max-width: 768px) {
+    padding: 20px 16px;
+  }
 `;
 
-const PageTitle = styled.h1`
+const Title = styled.h1`
   text-align: center;
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
+  font-size: 3.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
   font-family: 'Times New Roman', serif;
   color: #2A2E29;
-`;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 
-const ProductGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 0 20px;
-`;
+  @media (max-width: 768px) {
+    font-size: 2.5rem;
+  }
 
-const ProductCard = styled.div`
-  border: 1px solid #eee;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.3s ease;
-  
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  @media (max-width: 480px) {
+    font-size: 2rem;
   }
 `;
 
-const ProductImageWrapper = styled.div`
-  position: relative;
-  width: 100%;
-  height: 300px;
-`;
-
-const ProductInfo = styled.div`
-  padding: 1.5rem;
+const Subtitle = styled.p`
   text-align: center;
-`;
-
-const ProductTitle = styled.h3`
   font-size: 1.2rem;
-  margin-bottom: 0.5rem;
   color: #666;
+  margin-bottom: 40px;
+  max-width: 600px;
+  line-height: 1.6;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+  }
 `;
 
-const ProductPrice = styled.p`
-  font-size: 1.1rem;
-  color: #666;
-  margin-bottom: 1rem;
+const Input = styled.input`
+  width: 100%;
+  max-width: 600px;
+  padding: 15px;
+  margin-bottom: 30px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: white;
+  color: black;
+  
+  &::placeholder {
+    color: #999;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #2A2E29;
+  }
 `;
 
-const BuyButton = styled.button`
-  padding: 10px 20px;
+const Button = styled.button`
   background-color: #2A2E29;
   color: white;
+  padding: 15px 40px;
   border: none;
   border-radius: 4px;
+  font-size: 1.1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: opacity 0.3s ease;
   
   &:hover {
-    background-color: #1a1e19;
+    opacity: 0.9;
   }
 `;
 
-export default function GiftList() {
-  const [products, setProducts] = useState<GiftsType[]>([])
+const Arrow = styled.span`
+  font-size: 1.5rem;
+`;
 
-  useEffect(() => {
-    loadData()
-  }, [])
+export default function ConfirmPresence() {
+  const [identity, setIdentity] = useState<string>('')
 
-  const loadData = async () => {
-    const res = await dataBase
-    .get({
-      collection: 'gifts',
-      filter: [
-        { ['isChecked']: false, condition: '==' }
-      ]
-    }) as GiftsType[]
-
-    setProducts(res)
-  }
-
-  function formatCurrToNumber(curr: string): number {
-    return Number(curr.replaceAll('.', '').replace(',', '.'));
-  }
-
-  const onPay = async (item: GiftsType) => {
+  const onNext = async () => {
     try {
-      let unit_price = formatCurrToNumber(item.priceCard)
-      if (item.quote !== 1)
-        unit_price = unit_price / item.quote
-
-      const preference = {
-        items: [
+      const res = await dataBase
+      .get({
+        collection: 'persons',
+        filter: [
           {
-            title: item.name,
-            quantity: 1,
-            currency_id: "BRL",
-            unit_price
+            ['name']: identity,
+            condition: '=='
           },
         ],
-        back_urls: {
-          success: `https://luana-alan.vercel.app/success?id=${item.id}`,
-          failure: `https://luana-alan.vercel.app/failure?id=${item.id}`,
-          pending: `https://luana-alan.vercel.app/pending?id=${item.id}`,
-        },
-      };
+        oneResult: true,
+      }) as PersonsType
 
-      const response = await fetch(
-        "https://api.mercadopago.com/checkout/preferences",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer APP_USR-31190576768230-112209-85e6d2a7e9ad081d6297041c26a17148-461658331`,
-          },
-          body: JSON.stringify(preference),
-        }
-      );
+      if (!res)
+        throw 'Nenhum convite encontrado neste nome!'
 
-      const data = await response.json();
-      if (data.id) {
-        window.location.href = data.init_point;
-      }
-    } catch (error) {
-      alert(error);
+      if (res.isChecked)
+        throw 'Sua presença já foi confirmada antes!'
+
+      await dataBase
+      .update({
+        collection: 'persons',
+        fields: [{
+          name: 'isChecked', value: true
+        }],
+        reference: res.id
+      })
+
+      setIdentity('')
+      alert('Presença confirmada!')
+    } catch (e) {
+      alert(e)
     }
   }
 
@@ -147,27 +150,21 @@ export default function GiftList() {
     <div style={{ backgroundColor: '#F5F5F5' }}>
       <Header />
       <MainContent>
-        <PageTitle>Lista de Presentes</PageTitle>
-        <ProductGrid>
-          {products.map((product) => (
-            <ProductCard key={product.id}>
-              <ProductImageWrapper>
-                <Image
-                  src={`/gifts/${product.id}.png`}
-                  alt={product.name}
-                  layout="fill"
-                  objectFit="cover"
-                />
-              </ProductImageWrapper>
-              <ProductInfo>
-                <ProductTitle>{product.name}</ProductTitle>
-                <ProductPrice>R$ {product.priceCard}</ProductPrice>
-                <ProductPrice>Cotas Disponíveis: {product.quote}</ProductPrice>
-                <BuyButton onClick={() => onPay(product)}>Presentear</BuyButton>
-              </ProductInfo>
-            </ProductCard>
-          ))}
-        </ProductGrid>
+        <ContentSection>
+          <Title>Qual o nome que está no convite?</Title>
+          <Subtitle>
+            Você pode informar o nome do convite enviado por Luana & Alan
+          </Subtitle>
+          <Input
+            value={identity}
+            onChange={(a) => setIdentity(a.target.value)}
+            type="text" 
+            placeholder="Identificação do convite"
+          />
+          <Button onClick={onNext}>
+            Continuar <Arrow>→</Arrow>
+          </Button>
+        </ContentSection>
       </MainContent>
       <Footer />
     </div>
