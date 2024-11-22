@@ -5,7 +5,6 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import dataBase from '@/firebase/contents';
 import { GiftsType } from '@/firebase/types/persons';
-import Link from 'next/link';
 
 const MainContent = styled.main`
   padding-top: 120px;
@@ -103,19 +102,23 @@ export default function GiftList() {
 
   const onPay = async (item: GiftsType) => {
     try {
+      let unit_price = formatCurrToNumber(item.priceCard)
+      if (item.quote !== 1)
+        unit_price = unit_price / item.quote
+
       const preference = {
         items: [
           {
             title: item.name,
             quantity: 1,
             currency_id: "BRL",
-            unit_price: formatCurrToNumber(item.priceCard)
+            unit_price
           },
         ],
         back_urls: {
-          success: `https://seusite.com/success/${item.id}`,
-          failure: `https://seusite.com/failure/${item.id}`,
-          pending: `https://seusite.com/pending/${item.id}`,
+          success: `https://luana-alan.vercel.app/success?id=${item.id}`,
+          failure: `https://luana-alan.vercel.app/failure?id=${item.id}`,
+          pending: `https://luana-alan.vercel.app/pending?id=${item.id}`,
         },
       };
 
@@ -125,7 +128,7 @@ export default function GiftList() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer SEU_ACCESS_TOKEN`, // Substitua pelo Access Token
+            Authorization: `Bearer APP_USR-31190576768230-112209-85e6d2a7e9ad081d6297041c26a17148-461658331`,
           },
           body: JSON.stringify(preference),
         }
@@ -133,7 +136,6 @@ export default function GiftList() {
 
       const data = await response.json();
       if (data.id) {
-        // Redireciona para o link de pagamento
         window.location.href = data.init_point;
       }
     } catch (error) {
@@ -161,9 +163,7 @@ export default function GiftList() {
                 <ProductTitle>{product.name}</ProductTitle>
                 <ProductPrice>R$ {product.priceCard}</ProductPrice>
                 <ProductPrice>Cotas Disponíveis: {product.quote}</ProductPrice>
-                {/* <Link href={product.urlPayment ?? ''} target='_blank'> */}
-                  <BuyButton onClick={() => onPay(product)}>Presentear</BuyButton>
-                {/* </Link> */}
+                <BuyButton onClick={() => onPay(product)}>Presentear</BuyButton>
               </ProductInfo>
             </ProductCard>
           ))}
