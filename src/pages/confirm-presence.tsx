@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import dataBase from '@/firebase/contents';
 import { PersonsType } from '@/firebase/types/persons';
+import Image from 'next/image';
 
 const MainContent = styled.main`
   padding-top: 120px;
@@ -33,6 +34,10 @@ const BoxDate = styled.div`
   display: flex;
   flex-direction: row;
   gap: 3.5rem;
+
+  @media (max-width: 768px) {
+    margin-top: 2rem;
+  }
 `
 
 const TextDate = styled.h1`
@@ -99,6 +104,19 @@ const Subtitle2 = styled.p`
   }
 `;
 
+const Divisor = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 3rem;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 3rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`
+
 const Input = styled.input`
   width: 100%;
   max-width: 600px;
@@ -156,7 +174,6 @@ export default function ConfirmPresence() {
   useEffect(() => {
     const interval = setInterval(() => {
       let targetDate = new Date('2025-02-22')
-      console.log('-', targetDate)
       const now = new Date().getTime();
       const distance = targetDate.getTime() - now;
 
@@ -255,6 +272,29 @@ export default function ConfirmPresence() {
           <Button onClick={onNext}>
             Continuar <Arrow>→</Arrow>
           </Button>
+          <Title style={{ marginTop: 50 }}>Traje sugerido</Title>
+          <Divisor>
+            <Image
+              src='/images/dress.png'
+              width={100}
+              height={150}
+              alt='vestido'
+            />
+            <Subtitle>
+              Pedimos apenas para não usar tons de verde, pois é a cor do vestido das madrinhas. Nem branco pois é  a cor do vestido da noiva.
+            </Subtitle>
+          </Divisor>
+          <Divisor>
+            <Image
+              src='/images/suit.png'
+              width={120}
+              height={120}
+              alt='vestido'
+            />
+            <Subtitle>
+              Traje esporte fino ou terno.
+            </Subtitle>
+          </Divisor>
         </ContentSection>
       </MainContent>
       <Footer />
