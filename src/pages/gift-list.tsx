@@ -88,9 +88,6 @@ export default function GiftList() {
     const res = await dataBase
     .get({
       collection: 'gifts',
-      filter: [
-        { ['isChecked']: false, condition: '==' }
-      ]
     }) as GiftsType[]
 
     setProducts(res)
@@ -163,7 +160,15 @@ export default function GiftList() {
                 <ProductTitle>{product.name}</ProductTitle>
                 <ProductPrice>R$ {product.priceCard}</ProductPrice>
                 <ProductPrice>Cotas Disponíveis: {product.quote}</ProductPrice>
-                <BuyButton onClick={() => onPay(product)}>Presentear</BuyButton>
+                <BuyButton
+                  onClick={() => onPay(product)}
+                  disabled={product.isChecked}
+                  style={product.isChecked ? {
+                    background: '#555'
+                  } : {}}
+                >
+                  { product.isChecked ? 'Indisponível' : 'Presentear' }
+                </BuyButton>
               </ProductInfo>
             </ProductCard>
           ))}

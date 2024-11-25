@@ -15,7 +15,7 @@ export type ArrayQueryDocumentType = Array<{ id: string; [key: string]: any}> | 
 
 export type GetType = {
     collection: CollectionsType
-    filter: SearchColumnsType[]
+    filter?: SearchColumnsType[]
     orderBy?: OrderByColumnsType[]
     oneResult?: boolean
 }

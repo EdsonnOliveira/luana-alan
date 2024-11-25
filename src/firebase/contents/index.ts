@@ -23,9 +23,11 @@ const get = async ({ collection, filter, orderBy, oneResult }: GetType) => {
     return new Promise(async (resolve, reject) => {
         let q: Query = query(Collection(db, collection))
 
-        filter.forEach((f) => {
-            q = query(q, where(Object.keys(f)[0], f.condition, Object.values(f)[0]));
-        })
+        if (filter) {
+            filter.forEach((f) => {
+                q = query(q, where(Object.keys(f)[0], f.condition, Object.values(f)[0]));
+            })
+        }
         
         if (orderBy) {
             orderBy.forEach((f) => {
